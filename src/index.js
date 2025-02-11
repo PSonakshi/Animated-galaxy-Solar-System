@@ -99,7 +99,6 @@ Promise.all(planetPromises).then(() => {
   animate();
 });
 
-
 // Lighting setup
 const ambientLight = new THREE.AmbientLight(0x404040, 1);
 scene.add(ambientLight);
@@ -314,3 +313,46 @@ function animate() {
   controls.update();
   renderer.render(scene, camera);
 }
+
+// Create Rings around Saturn and Jupiter
+function createRing(planet, radius, innerRadius, outerRadius, texturePath) {
+  const ringGeometry = new THREE.RingGeometry(innerRadius, outerRadius, 64);
+  textureLoader.load(texturePath, (texture) => {
+    const ringMaterial = new THREE.MeshBasicMaterial({
+      map: texture,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.7,
+    });
+    const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+    ring.rotation.x = Math.PI / 2; // Align the ring horizontally
+    ring.position.set(planet.position.x, planet.position.y, planet.position.z);
+    scene.add(ring);
+  });
+}
+
+// Add rings to Saturn and Jupiter
+createRing(planets[5], 16, 14, 18, './saturn_ring.png'); // Saturn rings
+createRing(planets[4], 12, 10, 14, './jupiter_ring.png'); // Jupiter rings
+
+// Create the Asteroid Belt between Mars and Jupiter
+function createAsteroidBelt() {
+  const asteroidGeometry = new THREE.SphereGeometry(0.1, 8, 8);
+  const asteroidMaterial = new THREE.MeshPhongMaterial({ color: 0xaaaaaa });
+  const asteroidBelt = [];
+
+  for (let i = 0; i < 150; i++) { // Reduced the number of asteroids for a less crowded belt
+    const distance = Math.random() * (12 - 9) + 9; // Narrowed the asteroid belt width
+    const angle = Math.random() * Math.PI * 2;
+    const x = distance * Math.cos(angle);
+    const z = distance * Math.sin(angle);
+
+    const asteroid = new THREE.Mesh(asteroidGeometry, asteroidMaterial);
+    asteroid.position.set(x, Math.random() * 2 - 1, z);
+    asteroidBelt.push(asteroid);
+    scene.add(asteroid);
+  }
+}
+
+// Create Asteroid Belt
+createAsteroidBelt();
